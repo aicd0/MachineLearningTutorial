@@ -1,7 +1,6 @@
-1. 运行 _01_data2npz.py
-2. 运行 _03_similarity_measurement.py
-3. 运行 _04_feature_extraction.py
-4. 在自动生成的 outputs 目录下查看结果
+1. 运行 _03_similarity_measurement.py
+2. 运行 _04_feature_extraction.py
+3. 在自动生成的 outputs 目录下查看结果
 
 ## 说明
 * 相似性度量指标采用曼哈顿距离(Manhattan Distance)，窗口大小为500，每次移动50个单位距离，两个窗口不允许重叠。
