@@ -54,9 +54,8 @@ def atomic_print_and_log(content: Any, end: str='\n', time_stamp: bool=False, fi
     __atomic_print_and_log_mutex.release()
 
 # others
-def check_npz_files() -> bool:
-    from _01_data2npz import output_path as input_path
+def check_npz_files() -> None:
+    import _01_data2npz
+    input_path = _01_data2npz.output_path
     if not os.path.exists(input_path) or len(os.listdir(input_path)) == 0:
-        print('No npz files detected. Run _01_data2npz.py first.')
-        return False
-    return True
+        _01_data2npz.main()

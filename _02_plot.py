@@ -11,9 +11,7 @@ from _01_data2npz import output_path as input_path
 output_path = 'outputs\\02_plot\\'
 
 def main():
-    if not utils.check_npz_files():
-        return
-
+    utils.check_npz_files()
     if not os.path.exists(output_path):
         os.makedirs(output_path)
 

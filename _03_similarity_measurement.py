@@ -40,9 +40,7 @@ def main():
     input_file_path = input_path + input_file
     log_file = output_path + log_file
     
-    if not utils.check_npz_files():
-        return
-    
+    utils.check_npz_files()
     if not os.path.exists(output_path):
         os.makedirs(output_path)
 
