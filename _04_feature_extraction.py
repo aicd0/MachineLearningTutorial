@@ -64,7 +64,7 @@ def permutation_entropy(data, m, step=1):
 
     x = np.empty((k, m))
     for i in range(k):
-        x[i] = data[i : i + m]
+        x[i] = data[i * step : i * step + m]
 
     index = np.argsort(x, axis=1)
     index_str = [str(i)[1 : -1] for i in index]
