@@ -54,8 +54,26 @@ def atomic_print_and_log(content: Any, end: str='\n', time_stamp: bool=False, fi
     __atomic_print_and_log_mutex.release()
 
 # others
-def check_npz_files() -> None:
+def check_01() -> None:
     import _01_data2npz
     input_path = _01_data2npz.output_path
     if not os.path.exists(input_path) or len(os.listdir(input_path)) == 0:
         _01_data2npz.main()
+
+def check_04() -> None:
+    import _04_combine
+    input_file_path = _04_combine.output_file_path
+    if not os.path.exists(input_file_path):
+        _04_combine.main()
+
+def check_05() -> None:
+    import _05_feature_extraction
+    input_file_path = _05_feature_extraction.output_file_path
+    if not os.path.exists(input_file_path):
+        _05_feature_extraction.main()
+
+def check_07() -> None:
+    import _07_add_labels
+    input_file_path = _07_add_labels.output_file_path
+    if not os.path.exists(input_file_path):
+        _07_add_labels.main()

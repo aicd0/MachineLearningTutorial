@@ -9,9 +9,11 @@ import dependence.utils as utils
 
 from collections import Counter
 from scipy import stats
-from _01_data2npz import output_path as input_path
+from _04_combine import output_file_path as input_file_path
 
-output_path = 'outputs\\04_feature_extraction\\'
+output_path = 'outputs\\05_feature_extraction\\'
+output_file = 'features.txt'
+output_file_path = output_path + output_file
 
 def renyi_entropy(data, alpha):
     return math.log(np.sum(data ** alpha)) / (1 - alpha)
@@ -78,43 +80,37 @@ def permutation_entropy(data, m, step=1):
     return pe / math.log(math.factorial(m))
 
 def main():
-    utils.check_npz_files()
+    utils.check_04()
     if not os.path.exists(output_path):
         os.makedirs(output_path)
 
-    for file_name in os.listdir(input_path):
-        input_file_path = input_path + file_name
-        output_file_path = output_path + utils.get_display_name(file_name) + '.txt'
-        data = np.load(input_file_path)['data']
+    data = np.load(input_file_path)['data']
+    sample_count = data.shape[0]
+    sample_dims = data.shape[1]
 
-        size = 3000
-        all_features = []
+    labels = ['start', 'skew', 'kurtosis', 're_en', 'ap_en', 'sa_en', 'pe_en']
+    all_features = []
 
-        for i in range(0, len(data), size):
-            data_trimmed = data[i : i + size]
-            if len(data_trimmed) != size:
-                continue
+    for i in range(0, sample_count):
+        features = []
+        features.append(i * sample_dims)
+        # Skewness
+        features.append(stats.skew(data[i]))
+        # Kurtosis
+        features.append(stats.kurtosis(data[i]))
+        # Renyi Entropy
+        features.append(renyi_entropy(data[i], alpha=2))
+        # Approximate Entropy
+        features.append(approximate_entropy(data[i], m=6))
+        # Sample Entropy
+        features.append(sample_entropy(data[i], m=6))
+        # Permutation Entropy
+        features.append(permutation_entropy(data[i], m=6, step=1))
+        all_features.append(features)
 
-            features = {}
-            features['start'] = i
-            # Skewness
-            features['skew'] = stats.skew(data_trimmed)
-            # Kurtosis
-            features['kurtosis'] = stats.kurtosis(data_trimmed)
-            # Renyi Entropy
-            features['re_en'] = renyi_entropy(data_trimmed, alpha=2)
-            # Approximate Entropy
-            features['ap_en'] = approximate_entropy(data_trimmed, m=6)
-            # Sample Entropy
-            features['sa_en'] = sample_entropy(data_trimmed, m=6)
-            # Permutation Entropy
-            features['pe_en'] = permutation_entropy(data_trimmed, m=6, step=1)
-            all_features.append(features)
-            print('start=%d' % i)
-
-        with open(output_file_path, 'w') as f:
-            json.dump(all_features, f)
-        print(output_file_path)
+    with open(output_file_path, 'w') as f:
+        json.dump([labels, all_features], f)
+    print(output_file_path)
 
 if __name__ == '__main__':
     main()
