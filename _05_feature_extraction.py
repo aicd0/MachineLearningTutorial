@@ -88,7 +88,7 @@ def main():
     sample_count = data.shape[0]
     sample_dims = data.shape[1]
 
-    labels = ['start', 'skew', 'kurtosis', 're_en', 'ap_en', 'sa_en', 'pe_en']
+    titles = ['start', 'skew', 'kurtosis', 're_en', 'ap_en', 'sa_en', 'pe_en']
     all_features = []
 
     for i in range(0, sample_count):
@@ -107,9 +107,11 @@ def main():
         # Permutation Entropy
         features.append(permutation_entropy(data[i], m=6, step=1))
         all_features.append(features)
+        print('\r%d of %d processed.' % (i + 1, sample_count), end='')
+    print()
 
     with open(output_file_path, 'w') as f:
-        json.dump([labels, all_features], f)
+        json.dump([titles, all_features], f)
     print(output_file_path)
 
 if __name__ == '__main__':

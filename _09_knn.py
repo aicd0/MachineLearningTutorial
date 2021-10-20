@@ -1,0 +1,52 @@
+import json
+import numpy as np
+import dependence.utils as utils
+
+from _04_combine import output_file_path as data_file_path
+from _07_add_labels import output_file_path as labels_file_path
+
+def main():
+    utils.check_07()
+
+    data_all = np.load(data_file_path)['data']
+    with open(labels_file_path, 'r') as f:
+        labels_src = json.load(f)
+
+    labels_all = [i[1:] for i in labels_src[1]]
+    label_titles = labels_src[0][1:]
+
+    trainset_ratio = 0.9
+    train_count = round(len(data_all) * trainset_ratio)
+
+    data_train = np.array(data_all[0 : train_count])
+    data_test = np.array(data_all[train_count:])
+    labels_train = np.array(labels_all[0 : train_count], dtype=np.int32)
+    labels_test = np.array(labels_all[train_count:], dtype=np.int32)
+    
+    k = 20
+
+    for l, label_title in enumerate(label_titles):
+        labels_train_sub = np.array([v[l] for v in labels_train], dtype=np.uint32)
+        labels_test_sub = np.array([v[l] for v in labels_test], dtype=np.uint32)
+        categories_count = np.max(labels_test_sub) + 1
+        correct = 0
+
+        for d, data in enumerate(data_test):
+            distances = (data * data_train).sum(axis=1) / (np.linalg.norm(data) * np.linalg.norm(data_train, axis=1))
+            order = distances.argsort()
+            votes = np.zeros((categories_count), dtype=np.uint32)
+
+            for j, o in enumerate(order):
+                if o >= k:
+                    continue
+                votes[labels_train_sub[j]] += 1
+            
+            predict = np.argmax(votes)
+            expect = labels_test_sub[d]
+            if predict == expect:
+                correct += 1
+        
+        print('label=%s, accuracy=%.1f%%' % (label_title, correct / len(data_test) * 100))
+
+if __name__ == '__main__':
+    main()

@@ -93,18 +93,18 @@ def main():
     hsphere_labels = hypersphere_labels(data)
     c_labels = custom_labels(data)
 
-    labels = ['start', 'km', 'hs', 'cs']
+    titles = ['start', 'km', 'hs', 'cs']
     all_labels = []
     for i in range(size):
-        current_labels = []
-        current_labels.append(i * step)
-        current_labels.append(k_means_labels[i])
-        current_labels.append(hsphere_labels[i])
-        current_labels.append(c_labels[i])
-        all_labels.append(current_labels)
+        labels = []
+        labels.append(i * step)
+        labels.append(k_means_labels[i])
+        labels.append(hsphere_labels[i])
+        labels.append(c_labels[i])
+        all_labels.append(labels)
 
     with open(output_file_path, 'w') as f:
-        json.dump([labels, all_labels], f)
+        json.dump([titles, all_labels], f)
     print(output_file_path)
 
 if __name__ == '__main__':

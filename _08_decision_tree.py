@@ -1,8 +1,6 @@
 import json
 import numpy as np
 import os
-
-from numpy.core.defchararray import less
 import dependence.utils as utils
 
 from _05_feature_extraction import output_file_path as features_file
@@ -101,13 +99,13 @@ depth : int, optional
         less=n1_node,
         larger=n2_node)
 
-def test(root_node: Node, features: list, feature_labels: list[str], labels: list):
+def test(root_node: Node, features: list, feature_titles: list[str], labels: list):
     correct = 0
     total = 0
 
     for i, features in enumerate(features):
         features_dict = {}
-        for j, name in enumerate(feature_labels):
+        for j, name in enumerate(feature_titles):
             features_dict[name] = features[j]
 
         pridict = root_node.test(features_dict)
@@ -132,8 +130,8 @@ def main():
 
     features_all = [i[1:] for i in features_src[1]]
     labels_all = [i[1:] for i in labels_src[1]]
-    feature_labels = features_src[0][1:]
-    label_labels = labels_src[0][1:]
+    feature_titles = features_src[0][1:]
+    label_titles = labels_src[0][1:]
 
     trainset_ratio = 0.9
     train_count = round(len(features_all) * trainset_ratio)
@@ -146,10 +144,10 @@ def main():
     # train
     results = {}
 
-    for i, label in enumerate(label_labels):
+    for i, label in enumerate(label_titles):
         labels = np.array([v[i] for v in labels_train], dtype=np.uint32)
         data = list(zip(features_train, labels))
-        root = get_node(data, feature_labels)
+        root = get_node(data, feature_titles)
         results[label] = root.tolist()
 
     with open(output_file_path, 'w') as f:
@@ -162,13 +160,13 @@ def main():
     
     for k, v in decision_tree_src.items():
         root = Node.fromlist(v)
-        label_idx = label_labels.index(k)
+        label_idx = label_titles.index(k)
 
         labels = np.array([v[label_idx] for v in labels_train], dtype=np.uint32)
-        acc_train = test(root, features_train, feature_labels, labels)
+        acc_train = test(root, features_train, feature_titles, labels)
         
         labels = np.array([v[label_idx] for v in labels_test], dtype=np.uint32)
-        acc_test = test(root, features_test, feature_labels, labels)
+        acc_test = test(root, features_test, feature_titles, labels)
 
         print('label=' + k + ', train_acc=%.1f%%, test_acc=%.1f%%' % (acc_train * 100, acc_test * 100))
 
