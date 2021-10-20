@@ -1,6 +1,7 @@
 import json
 import numpy as np
 import os
+import random
 import dependence.utils as utils
 
 from _05_feature_extraction import output_file_path as features_file
@@ -128,10 +129,12 @@ def main():
     with open(labels_file, 'r') as f:
         labels_src = json.load(f)
 
-    features_all = [i[1:] for i in features_src[1]]
-    labels_all = [i[1:] for i in labels_src[1]]
     feature_titles = features_src[0][1:]
     label_titles = labels_src[0][1:]
+
+    features_all = [i[1:] for i in features_src[1]]
+    labels_all = [i[1:] for i in labels_src[1]]
+    features_all, labels_all = utils.shuffle(zip(features_all, labels_all))
 
     trainset_ratio = 0.9
     train_count = round(len(features_all) * trainset_ratio)

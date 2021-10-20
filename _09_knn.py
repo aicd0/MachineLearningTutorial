@@ -13,6 +13,8 @@ def main():
         labels_src = json.load(f)
 
     labels_all = [i[1:] for i in labels_src[1]]
+    data_all, labels_all = utils.shuffle(zip(data_all, labels_all))
+
     label_titles = labels_src[0][1:]
 
     trainset_ratio = 0.9
@@ -23,7 +25,7 @@ def main():
     labels_train = np.array(labels_all[0 : train_count], dtype=np.int32)
     labels_test = np.array(labels_all[train_count:], dtype=np.int32)
     
-    k = 20
+    k = 10
 
     for l, label_title in enumerate(label_titles):
         labels_train_sub = np.array([v[l] for v in labels_train], dtype=np.uint32)
@@ -32,14 +34,14 @@ def main():
         correct = 0
 
         for d, data in enumerate(data_test):
-            distances = (data * data_train).sum(axis=1) / (np.linalg.norm(data) * np.linalg.norm(data_train, axis=1))
+            # Cosine Similarity
+            similarities = (data * data_train).sum(axis=1) / (np.linalg.norm(data) * np.linalg.norm(data_train, axis=1))
+            distances = -similarities
             order = distances.argsort()
             votes = np.zeros((categories_count), dtype=np.uint32)
 
-            for j, o in enumerate(order):
-                if o >= k:
-                    continue
-                votes[labels_train_sub[j]] += 1
+            for i in order[:k]:
+                votes[labels_train_sub[i]] += 1
             
             predict = np.argmax(votes)
             expect = labels_test_sub[d]

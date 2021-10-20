@@ -1,11 +1,18 @@
 import os
+import random
 import threading
 import time
 import dependence.global_config as global_config
 
-from typing import Any
+from typing import Any, Tuple
 
-# grammar
+# random
+def shuffle(x: zip) -> Tuple:
+    x = list(x)
+    random.shuffle(x)
+    return zip(*x)
+
+# type
 def is_none(obj) -> bool:
     return type(obj) == type(None)
 

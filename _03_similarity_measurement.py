@@ -28,10 +28,15 @@ def save_fig_2(data_1, data_2, title_1, title_2, file):
     plt.close('all')
 
 def distance(data_1, data_2) -> float:
+    # Cosine Similarity
+    similarity = (data_1 * data_2).sum() / (np.linalg.norm(data_1) * np.linalg.norm(data_2))
+    dist = -similarity
+
     # Euclidean Distance
     # dist = np.linalg.norm(data_1 - data_2)
+
     # Manhattan Distance
-    dist = np.abs(data_1 - data_2).sum()
+    # dist = np.abs(data_1 - data_2).sum()
 
     return dist
 
