@@ -31,7 +31,11 @@ def main():
         labels_train_sub = np.array([v[l] for v in labels_train], dtype=np.uint32)
         labels_test_sub = np.array([v[l] for v in labels_test], dtype=np.uint32)
         categories_count = np.max(labels_test_sub) + 1
-        correct = 0
+
+        tp = 0
+        fp = 0
+        tn = 0
+        fn = 0
 
         for d, data in enumerate(data_test):
             # Cosine Similarity
@@ -45,10 +49,20 @@ def main():
             
             predict = np.argmax(votes)
             expect = labels_test_sub[d]
+
+            # confusion matrix
             if predict == expect:
-                correct += 1
+                if predict == 0:
+                    tp += 1
+                else:
+                    tn += 1
+            else:
+                if predict == 0:
+                    fp += 1
+                else:
+                    fn += 1
         
-        print('label=%s, accuracy=%.1f%%' % (label_title, correct / len(data_test) * 100))
+        print('label=%s, tp=%d, fn=%d, fp=%d, tn=%d, accuracy=%.1f%%, precision=%.1f%%' % (label_title, tp, fn, fp, tn, tp / (tp + fp) * 100, tp / (tp + fn) * 100))
 
 if __name__ == '__main__':
     main()
