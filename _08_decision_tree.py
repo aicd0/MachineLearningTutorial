@@ -3,7 +3,6 @@ import numpy as np
 import os
 import dependence.utils as utils
 
-from typing import Tuple
 from _05_feature_extraction import output_file_path as features_file
 from _07_add_labels import output_file_path as labels_file
 
@@ -100,33 +99,17 @@ depth : int, optional
         less=n1_node,
         larger=n2_node)
 
-def test(root_node: Node, features: list, feature_titles: list[str], labels: list) -> Tuple:
-    tp = 0
-    fp = 0
-    tn = 0
-    fn = 0
+def test(root_node: Node, features: list, feature_titles: list[str]):
+    predict = np.empty((len(features)), np.int32)
 
     for i, features in enumerate(features):
         features_dict = {}
         for j, name in enumerate(feature_titles):
             features_dict[name] = features[j]
 
-        predict = root_node.test(features_dict)
-        expect = labels[i]
-        
-        # confusion matrix
-        if predict == expect:
-            if predict == 0:
-                tp += 1
-            else:
-                tn += 1
-        else:
-            if predict == 0:
-                fp += 1
-            else:
-                fn += 1
+        predict[i] = root_node.test(features_dict)
     
-    return tp, fn, fp, tn
+    return predict
 
 def main():
     utils.check_05()
@@ -158,8 +141,8 @@ def main():
     results = {}
 
     for i, label in enumerate(label_titles):
-        labels = np.array([v[i] for v in labels_train], dtype=np.uint32)
-        data = list(zip(features_train, labels))
+        labels_train_sub = np.array([v[i] for v in labels_train], dtype=np.uint32)
+        data = list(zip(features_train, labels_train_sub))
         root = get_node(data, feature_titles)
         results[label] = root.tolist()
 
@@ -176,15 +159,17 @@ def main():
         root = Node.fromlist(v)
         label_idx = label_titles.index(k)
 
-        labels = np.array([v[label_idx] for v in labels_train], dtype=np.uint32)
-        tp, fn, fp, tn = test(root, features_train, feature_titles, labels)
+        labels_train_sub = np.array([v[label_idx] for v in labels_train], dtype=np.uint32)
+        predict = test(root, features_train, feature_titles)
+        cm = utils.confusion_matrix(predict, labels_train_sub, 0)
         print('trainset: ', end='')
-        print('tp=%d, fn=%d, fp=%d, tn=%d, accuracy=%.1f%%, precision=%.1f%%' % (tp, fn, fp, tn, tp / (tp + fp) * 100, tp / (tp + fn) * 100))
+        utils.analyse_confusion_matrix(cm)
         
-        labels = np.array([v[label_idx] for v in labels_test], dtype=np.uint32)
-        tp, fn, fp, tn = test(root, features_test, feature_titles, labels)
+        labels_test_sub = np.array([v[label_idx] for v in labels_test], dtype=np.uint32)
+        predict = test(root, features_test, feature_titles)
+        cm = utils.confusion_matrix(predict, labels_test_sub, 0)
         print('testset: ', end='')
-        print('tp=%d, fn=%d, fp=%d, tn=%d, accuracy=%.1f%%, precision=%.1f%%' % (tp, fn, fp, tn, tp / (tp + fp) * 100, tp / (tp + fn) * 100))
+        utils.analyse_confusion_matrix(cm)
 
 if __name__ == '__main__':
     main()
