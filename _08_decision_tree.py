@@ -40,7 +40,7 @@ class Node:
         node.res = x[4]
         return node
 
-def get_node(data: list, feature_labels: list[str], depth=0):
+def get_node(data: list, feature_labels: list[str], depth=0) -> Node:
     """
 Parameters
 ----------
