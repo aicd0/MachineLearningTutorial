@@ -9,12 +9,12 @@ output_file = 'combine.npz'
 output_file_path = output_path + output_file
 
 def main():
-    utils.check_01()
     if not os.path.exists(output_path):
         os.makedirs(output_path)
     
     combine = np.empty((0))
 
+    utils.check_01()
     for file_name in os.listdir(input_path):
         input_file_path = input_path + file_name
         data = np.load(input_file_path)['data']

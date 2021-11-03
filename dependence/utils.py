@@ -79,11 +79,11 @@ def check_05() -> None:
     if not os.path.exists(input_file_path):
         _05_feature_extraction.main()
 
-def check_07() -> None:
-    import _07_add_labels
-    input_file_path = _07_add_labels.output_file_path
+def check_06() -> None:
+    import _06_add_labels
+    input_file_path = _06_add_labels.output_file_path
     if not os.path.exists(input_file_path):
-        _07_add_labels.main()
+        _06_add_labels.main()
 
 def confusion_matrix(predict, expect, positive_label) -> Tuple:
     if predict.shape != expect.shape:

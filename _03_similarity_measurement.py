@@ -45,10 +45,10 @@ def main():
     input_file_path = input_path + input_file
     log_file = output_path + log_file
     
-    utils.check_01()
     if not os.path.exists(output_path):
         os.makedirs(output_path)
 
+    utils.check_01()
     data = np.load(input_file_path)['data']
 
     step = 50

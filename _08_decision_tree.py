@@ -4,7 +4,7 @@ import os
 import dependence.utils as utils
 
 from _05_feature_extraction import output_file_path as features_file
-from _07_add_labels import output_file_path as labels_file
+from _06_add_labels import output_file_path as labels_file
 
 output_path = 'outputs\\08_decision_tree\\'
 output_file = 'tree.txt'
@@ -113,7 +113,7 @@ def test(root_node: Node, features: list, feature_titles: list[str]):
 
 def main():
     utils.check_05()
-    utils.check_07()
+    utils.check_06()
     if not os.path.exists(output_path):
         os.makedirs(output_path)
 

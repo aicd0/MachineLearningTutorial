@@ -3,10 +3,10 @@ import numpy as np
 import dependence.utils as utils
 
 from _04_combine import output_file_path as data_file_path
-from _07_add_labels import output_file_path as labels_file_path
+from _06_add_labels import output_file_path as labels_file_path
 
 def main():
-    utils.check_07()
+    utils.check_06()
 
     data_all = np.load(data_file_path)['data']
     with open(labels_file_path, 'r') as f:

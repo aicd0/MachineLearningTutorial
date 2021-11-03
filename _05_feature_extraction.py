@@ -80,11 +80,12 @@ def permutation_entropy(data, m, step=1):
     return pe / math.log(math.factorial(m))
 
 def main():
-    utils.check_04()
     if not os.path.exists(output_path):
         os.makedirs(output_path)
 
+    utils.check_04()
     data = np.load(input_file_path)['data']
+    
     sample_count = data.shape[0]
     sample_dims = data.shape[1]
 

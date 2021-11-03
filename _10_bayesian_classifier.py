@@ -4,11 +4,11 @@ import dependence.utils as utils
 
 from sklearn.naive_bayes import GaussianNB
 from _05_feature_extraction import output_file_path as features_file
-from _07_add_labels import output_file_path as labels_file
+from _06_add_labels import output_file_path as labels_file
 
 def main():
     utils.check_05()
-    utils.check_07()
+    utils.check_06()
 
     with open(features_file, 'r') as f:
         features_src = json.load(f)

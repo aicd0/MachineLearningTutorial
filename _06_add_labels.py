@@ -5,9 +5,8 @@ import os
 import dependence.utils as utils
 
 from _04_combine import output_file_path as input_file_path
-from _06_k_means import k_means
 
-output_path = 'outputs\\07_add_labels\\'
+output_path = 'outputs\\06_add_labels\\'
 output_file = 'labels.txt'
 output_file_path = output_path + output_file
 
@@ -74,33 +73,40 @@ def hypersphere_labels(data, center=None, ratio: list=[0.5], w=None) -> list:
     
     return data_descretization(data_r2, ratio)
 
-def custom_labels(data, ratio: list=[0.5]) -> list:
+def custom_labels_1(data, ratio: list=[0.5]) -> list:
     dmin = data.min(axis=1, keepdims=True)
     dmax = data.max(axis=1, keepdims=True)
     val = np.sin(2 * math.pi * (data - dmin) / (dmax - dmin)).sum(axis=1)
     return data_descretization(val, ratio)
 
+def custom_labels_2(data, ratio: list=[0.5]) -> list:
+    dims = data.shape[1]
+    w = np.random.uniform(-1, 1, (1, dims))
+    val = (data * w).sum(axis=1)
+    return data_descretization(val, ratio)
+
 def main():
-    utils.check_04()
     if not os.path.exists(output_path):
         os.makedirs(output_path)
 
+    utils.check_04()
     data = np.load(input_file_path)['data']
-    size = data.shape[0]
-    step = data.shape[1]
-    
-    k_means_labels = k_means(data, 2)
-    hsphere_labels = hypersphere_labels(data)
-    c_labels = custom_labels(data)
 
-    titles = ['start', 'km', 'hs', 'cs']
+    data_count = data.shape[0]
+    dims = data.shape[1]
+    
+    labels_1 = hypersphere_labels(data)
+    labels_2 = custom_labels_1(data)
+    labels_3 = custom_labels_2(data)
+
+    titles = ['start', 'l1', 'l2', 'l3']
     all_labels = []
-    for i in range(size):
+    for i in range(data_count):
         labels = []
-        labels.append(i * step)
-        labels.append(k_means_labels[i])
-        labels.append(hsphere_labels[i])
-        labels.append(c_labels[i])
+        labels.append(i * dims)
+        labels.append(labels_1[i])
+        labels.append(labels_2[i])
+        labels.append(labels_3[i])
         all_labels.append(labels)
 
     with open(output_file_path, 'w') as f:

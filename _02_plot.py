@@ -11,10 +11,10 @@ from _01_data2npz import output_path as input_path
 output_path = 'outputs\\02_plot\\'
 
 def main():
-    utils.check_01()
     if not os.path.exists(output_path):
         os.makedirs(output_path)
 
+    utils.check_01()
     for file_name in os.listdir(input_path):
         input_file_path = input_path + file_name
         output_file_path = output_path + utils.get_display_name(file_name) + '.png'
@@ -22,7 +22,7 @@ def main():
     
         fig = plt.figure()
         ax = fig.add_subplot(111)
-        plt.plot(data,color='r')
+        plt.plot(data, color='r')
         ax.set_title('Denoised Signal')
         plt.ylabel('Amplitude')
         fig.tight_layout()
