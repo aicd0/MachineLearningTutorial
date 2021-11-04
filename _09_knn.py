@@ -1,5 +1,6 @@
 import json
 import numpy as np
+import dependence.evaluation as eval
 import dependence.utils as utils
 
 from _04_combine import output_file_path as data_file_path
@@ -45,9 +46,9 @@ def main():
             
             predict[d] = np.argmax(votes)
         
-        cm = utils.confusion_matrix(predict, labels_test_sub, 0)
+        cm = eval.confusion_matrix(predict, labels_test_sub, 0)
         print('label=%s, ' % label_title, end='')
-        utils.analyse_confusion_matrix(cm)
+        eval.print_confusion_matrix(cm)
 
 if __name__ == '__main__':
     main()

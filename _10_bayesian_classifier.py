@@ -1,5 +1,6 @@
 import json
 import numpy as np
+import dependence.evaluation as eval
 import dependence.utils as utils
 
 from sklearn.naive_bayes import GaussianNB
@@ -38,9 +39,9 @@ def main():
         # test
         predict = clf.predict(features_test)
         labels_test_sub = np.array([v[i] for v in labels_test], dtype=np.uint32)
-        cm = utils.confusion_matrix(predict, labels_test_sub, 0)
+        cm = eval.confusion_matrix(predict, labels_test_sub, 0)
         print('label=%s, ' % label, end='')
-        utils.analyse_confusion_matrix(cm)
+        eval.print_confusion_matrix(cm)
 
 if __name__ == '__main__':
     main()

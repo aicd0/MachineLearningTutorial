@@ -1,6 +1,7 @@
 import json
 import numpy as np
 import os
+import dependence.evaluation as eval
 import dependence.utils as utils
 
 from _05_feature_extraction import output_file_path as features_file
@@ -161,15 +162,15 @@ def main():
 
         labels_train_sub = np.array([v[label_idx] for v in labels_train], dtype=np.uint32)
         predict = test(root, features_train, feature_titles)
-        cm = utils.confusion_matrix(predict, labels_train_sub, 0)
+        cm = eval.confusion_matrix(predict, labels_train_sub, 0)
         print('trainset: ', end='')
-        utils.analyse_confusion_matrix(cm)
+        eval.print_confusion_matrix(cm)
         
         labels_test_sub = np.array([v[label_idx] for v in labels_test], dtype=np.uint32)
         predict = test(root, features_test, feature_titles)
-        cm = utils.confusion_matrix(predict, labels_test_sub, 0)
+        cm = eval.confusion_matrix(predict, labels_test_sub, 0)
         print('testset: ', end='')
-        utils.analyse_confusion_matrix(cm)
+        eval.print_confusion_matrix(cm)
 
 if __name__ == '__main__':
     main()

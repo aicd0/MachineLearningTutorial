@@ -3,12 +3,15 @@ import matplotlib.pylab as plt
 import numpy as np
 import os
 import random
+import dependence.evaluation as eval
 import dependence.utils as utils
 
+from sklearn import metrics
 from _04_combine import output_file_path as input_file_path
 from _06_add_labels import output_file_path as labels_file
 
 output_path = 'outputs\\07_k_means\\'
+log_file = 'log.txt'
 
 def k_means(data, k) -> list:
     data_count = data.shape[0]
@@ -49,54 +52,9 @@ def k_means(data, k) -> list:
     
     return results.tolist()
 
-def v_measure(new_labels, old_labels, beta=1):
-    new_labels = np.array(new_labels, np.uint32)
-    old_labels = np.array(old_labels, np.uint32)
-
-    if new_labels.shape != old_labels.shape:
-        raise ValueError()
-    if len(new_labels.shape) != 1:
-        raise ValueError()
-
-    data_count = len(new_labels)
-    new_categories = np.max(new_labels) + 1
-    old_categories = np.max(old_labels) + 1
-    new_to_old = np.empty((new_categories), np.uint32)
-
-    # calculate precision
-    precision = np.empty((new_categories))
-    
-    for new_label in range(new_categories):
-        votes = np.zeros((old_categories), np.uint32)
-
-        for i in range(data_count):
-            if new_labels[i] == new_label:
-                votes[old_labels[i]] += 1
-
-        new_to_old[new_label] = old_label = np.argmax(votes)
-        precision[new_label] = votes[old_label] / votes.sum()
-    
-    # calculate recall
-    correct = np.zeros((old_categories), np.uint32)
-    total = np.zeros((old_categories), np.uint32)
-
-    for i in range(data_count):
-        predict = new_to_old[new_labels[i]]
-        expect = old_labels[i]
-        total[expect] += 1
-
-        if predict == expect:
-            correct[expect] += 1
-
-    recall = correct / total
-
-    # calculate v
-    p = precision.mean()
-    r = recall.mean()
-    v = (1 + beta * beta) * p * r / (beta * beta * p + r)
-    return v
-
 def main():
+    log_file_path = output_path + log_file
+
     if not os.path.exists(output_path):
         os.makedirs(output_path)
     
@@ -114,34 +72,60 @@ def main():
     data_all = np.array(data_all)
 
     k_start = 2
-    k_end = 30
-    l_k_v = np.empty((label_count, k_end - k_start + 1))
+    k_end = 20
+    k_axis = range(k_start, k_end + 1)
+    l_k_v = np.empty((label_count, len(k_axis)))
+    l_k_s = np.empty((len(k_axis)))
 
-    for k in range(k_start, k_end + 1):
+    for k in k_axis:
         new_labels = k_means(data_all, k)
         output_file = 'k=%d.txt' % k
         output_file_path = output_path + output_file
 
         with open(output_file_path, 'w') as f:
             json.dump(new_labels, f)
-        print(output_file_path)
+        utils.atomic_print_and_log(output_file_path, file=log_file_path)
 
-        for l in range(label_count):
+        # silhouette coefficient
+        s = metrics.silhouette_score(data_all, new_labels)
+        utils.atomic_print_and_log('s=%f' % s, file=log_file_path)
+        l_k_s[k - k_start] = s
+
+        for l, label_title in enumerate(label_titles):
+            utils.atomic_print_and_log('label=%s' % label_title, end='', file=log_file_path)
             old_labels = np.array([v[l] for v in labels_all], dtype=np.uint32)
-            l_k_v[l][k - k_start] = v_measure(new_labels, old_labels)
+
+            # v-measure
+            p, r, v = eval.v_measure(new_labels, old_labels)
+            l_k_v[l][k - k_start] = v
+            utils.atomic_print_and_log(', p=%.1f%%, r=%.1f%%, v=%f' % (p*100, r*100, v), file=log_file_path)
     
-    # plot
-    fig = plt.figure()
+    # plot v-measure
+    fig = plt.figure(figsize=(8, 5.3 * len(label_titles)))
 
     for l, label_title in enumerate(label_titles):
         ax = fig.add_subplot(label_count, 1, l + 1)
         ax.set_title(label_title)
         plt.xlabel('k')
         plt.ylabel('v')
-        plt.plot(l_k_v[l], color='r')
+        plt.plot(k_axis, l_k_v[l], color='r')
 
     fig.tight_layout()
-    output_file_path = output_path + 'results.png'
+    output_file_path = output_path + 'v-measure.png'
+    plt.savefig(output_file_path)
+    print(output_file_path)
+    plt.close('all')
+
+    # plot silhouette coefficient
+    fig = plt.figure()
+    ax = fig.add_subplot(1, 1, 1)
+    ax.set_title('Silhouette Coefficient')
+    plt.xlabel('k')
+    plt.ylabel('s')
+    plt.plot(k_axis, l_k_s, color='r')
+
+    fig.tight_layout()
+    output_file_path = output_path + 'silhouette.png'
     plt.savefig(output_file_path)
     print(output_file_path)
     plt.close('all')
